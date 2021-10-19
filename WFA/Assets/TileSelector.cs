@@ -17,7 +17,7 @@ public class TileSelector : MonoBehaviour
 
             if (value != null) {
                 Debug.Log(gridPos + ", " + value.type + ", " + value.id);
-                SendMessages.inst.WriteTile((Vector2Int)gridPos, value.type.ToString());
+                //SendMessages.inst.WriteTile((Vector2Int)gridPos, (int)value.type);
             }
             else {
                 //Debug.Log("This tile isn't in the dict");

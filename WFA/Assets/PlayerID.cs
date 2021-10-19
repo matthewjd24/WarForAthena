@@ -15,18 +15,7 @@ public class PlayerID : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.LoginResponse += LogIn;
         EventManager.DCed += Disconnected;
-    }
-
-    void LogIn(string response)
-    {
-        if (response.Contains("Success")) {
-            isLoggedIn = true;
-        }
-        else {
-            isLoggedIn = false;
-        }
     }
 
     private void Disconnected()

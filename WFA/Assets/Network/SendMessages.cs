@@ -13,11 +13,11 @@ public class SendMessages : MonoBehaviour
 
     public void RequestTiles()
     {
-        int startX = 10;
-        int endX = 11;
+        int startX = 0;
+        int endX = 30;
 
-        int startY = 13;
-        int endY = 13;
+        int startY = 0;
+        int endY = 30;
 
         new NetMsg.RequestTileRange() {
             world = 1,
@@ -28,7 +28,7 @@ public class SendMessages : MonoBehaviour
         }.Send();
     }
 
-    public void WriteTile(Vector2Int pos, string tileType)
+    public void WriteTile(Vector2Int pos, int tileType)
     {
         new NetMsg.WriteTile() {
             world = 1,

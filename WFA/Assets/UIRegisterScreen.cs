@@ -5,21 +5,26 @@ using UnityEngine.UI;
 
 public class UIRegisterScreen : MonoBehaviour
 {
+    public static UIRegisterScreen inst;
+
     [SerializeField] InputField userinp;
     [SerializeField] InputField passinp;
     [SerializeField] InputField emailinp;
 
     [SerializeField] Text status;
 
+    private void Awake()
+    {
+        inst = this;
+    }
+
     private void OnEnable()
     {
         status.text = "";
-        EventManager.RegisterResponse += RegisterResponse;
     }
 
-    private void RegisterResponse(string response)
+    public void SetStatusText(string response)
     {
-        Debug.Log(response);
         status.text = response;
     }
 

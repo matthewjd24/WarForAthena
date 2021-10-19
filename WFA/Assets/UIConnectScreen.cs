@@ -9,11 +9,4 @@ public class UIConnectScreen : MonoBehaviour
         if (SslClient.sslStream != null && !SslClient.sslStream.IsClosed && SslClient.sslStream.IsAuthenticated) return;
         SslClient.inst.Connect(ip);
     }
-
-    //public void SendTestMessage()
-    //{
-    //    new NetMsg.TextMessage() {
-    //        msg = "hi"
-    //    }.Send();
-    //}
 }

@@ -123,21 +123,25 @@ public class TileMapGenerator : MonoBehaviour
     [ContextMenu("LogTiles")]
     void RecordSet()
     {
-        //foreach(var e in TileData.tilesInfo) {
-        //    Debug.Log(e.Key + ", " + e.Value.type + " " + e.Value.id);
-        //}
-
+        int i = 0;
         foreach (var position in map.cellBounds.allPositionsWithin) {
             if (!map.HasTile(position)) {
                 continue;
             }
 
+            i++;
+
             TileBase tbase = map.GetTile(position);
             Debug.Log($"{position}, {tbase.name}");
 
-            TileType theType = TileType.Plain;
-            TileInfo tileInfo = new TileInfo(theType, tbase);
-            TileData.tilesInfo.Add(position, tileInfo);
+            TileData.tilesInfo.TryGetValue(position, out TileInfo value);
+
+            if (value != null) {
+                Debug.Log("step " + i + ", pos " + position + ", " + value.type + ", " + value.id);
+                SendMessages.inst.WriteTile((Vector2Int)position, (int)value.type);
+            }
         }
+
+        Debug.Log("Done!");
     }
 }

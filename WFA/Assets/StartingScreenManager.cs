@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class StartingScreenManager : MonoBehaviour
 {
+    public static StartingScreenManager inst;
+
     [SerializeField] List<GameObject> children = new List<GameObject>();
+
+    [SerializeField] GameObject inGameUI;
+
+    private void Awake()
+    {
+        inst = this;
+    }
 
     void Start()
     {
-        EventManager.RegisterResponse += GoToGame;
-        EventManager.LoginResponse += GoToGame;
-
         foreach(Transform child in transform) {
             children.Add(child.gameObject);
         }
@@ -25,14 +31,14 @@ public class StartingScreenManager : MonoBehaviour
         children[1].SetActive(true);
     }
 
-    private void GoToGame(string response)
+    public void GoToGame()
     {
-        if (response.Contains("Success")) {
-            foreach (var e in children) {
-                e.SetActive(false);
-            }
-
-            Debug.Log("Going to game");
+        foreach (var e in children) {
+            e.SetActive(false);
         }
+
+        inGameUI.SetActive(true);
+
+        Debug.Log("Going to game");
     }
 }

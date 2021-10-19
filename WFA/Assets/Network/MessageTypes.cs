@@ -14,6 +14,7 @@ public static class NetMsg
         public int ID;
         public string response;
         public byte[] data;
+
         public void Send() {
             Type myType = GetType();
             FieldInfo[] info = myType.GetFields();
@@ -53,6 +54,15 @@ public static class NetMsg
 
             byte[] bytes = m.ToArray();
 
+            if (SslClient.sslStream == null) {
+                Debug.LogError("Stream is null");
+                return;
+            }
+            if (SslClient.sslStream.IsClosed) {
+                Debug.LogError("Stream is closed");
+                return;
+            }
+
             SslClient.sslStream.Write(bytes, 0, bytes.Length);
         }
         public virtual void Receive(byte[] data) { }
@@ -67,7 +77,7 @@ public static class NetMsg
 
         public override void Receive(byte[] data)
         {
-            EventManager.RecPing();
+            WaitForPingsFromServer.inst.ReceivedPing();
         }
     }
     public class Login : Message
@@ -78,6 +88,22 @@ public static class NetMsg
         }
         public string username;
         public string password;
+
+        public override void Receive(byte[] data)
+        {
+            using MemoryStream m = new MemoryStream(data);
+            using BinaryReader reader = new BinaryReader(m);
+
+            response = reader.ReadString();
+
+            Debug.Log("Login response: " + response);
+
+            UILogInScreen.inst.SetStatusText(response);
+            if (response.Contains("Success")) {
+                PlayerID.isLoggedIn = true;
+            }
+            StartingScreenManager.inst.GoToGame();
+        }
     }
     public class Register : Message
     {
@@ -88,6 +114,22 @@ public static class NetMsg
         public string username;
         public string password;
         public string email;
+
+        public override void Receive(byte[] data)
+        {
+            using MemoryStream m = new MemoryStream(data);
+            using BinaryReader reader = new BinaryReader(m);
+
+            response = reader.ReadString();
+
+            Debug.Log("Register response: " + response);
+
+            UIRegisterScreen.inst.SetStatusText(response);
+            if (response.Contains("Success")) {
+                PlayerID.isLoggedIn = true;
+            }
+            StartingScreenManager.inst.GoToGame();
+        }
     }
     public class WriteTile : Message
     {
@@ -99,7 +141,7 @@ public static class NetMsg
         public int world;
         public int x;
         public int y;
-        public string tileType;
+        public int tileType;
         public bool hasCity;
     }
 
@@ -127,7 +169,7 @@ public static class NetMsg
         public int world;
         public int x;
         public int y;
-        public string tileType;
+        public int tileType;
         public int city;
 
         public override void Receive(byte[] data)
@@ -139,12 +181,12 @@ public static class NetMsg
             world = reader.ReadInt32();
             x = reader.ReadInt32();
             y = reader.ReadInt32();
-            tileType = reader.ReadString();
+            tileType = reader.ReadInt32();
             city = reader.ReadInt32();
 
             Debug.Log("Received tile data. x: " + x + ", y: " + y + ", type " + tileType);
 
-            TileMapGenerator.inst.SetTile(x, y, TileType.Plain);
+            TileMapGenerator.inst.SetTile(x, y, (TileType)tileType);
         }
     }
 }

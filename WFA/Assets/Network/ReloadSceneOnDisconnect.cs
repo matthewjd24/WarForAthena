@@ -13,7 +13,6 @@ public class ReloadSceneOnDisconnect : MonoBehaviour
     IEnumerator WaitForDC()
     {
         yield return new WaitUntil(() => SslClient.sslStream != null);
-        Debug.Log("we have a stream");
 
         yield return new WaitForSeconds(3);
 
@@ -38,7 +37,6 @@ public class ReloadSceneOnDisconnect : MonoBehaviour
             
 
             if (shouldReload) {
-                Debug.Log("Reloading");
                 SceneManager.LoadScene(0);
             }
         }

@@ -254,7 +254,7 @@ namespace WFA_Server
             public int world;
             public int x;
             public int y;
-            public string tileType;
+            public int tileType;
             public bool hasCity;
 
 
@@ -297,9 +297,6 @@ namespace WFA_Server
                     using SqlConnection connection = new SqlConnection(connectionString);
                     SqlCommand command = new SqlCommand(queryString, connection);
 
-
-                    connection.InfoMessage += OnInfoMessageGenerated;
-
                     await connection.OpenAsync();
                     try {
                         SqlDataReader reader = command.ExecuteReader();
@@ -310,13 +307,10 @@ namespace WFA_Server
                         Console.WriteLine(e.Message);
                     }
 
+                    await Task.Delay(20);
+
                     return resp;
                 }
-            }
-
-            private void OnInfoMessageGenerated(object sender, SqlInfoMessageEventArgs e)
-            {
-                Console.WriteLine(e.Message);
             }
         }
 
@@ -384,25 +378,47 @@ namespace WFA_Server
                 Console.WriteLine("Got the tiles. The table has " + table.Rows.Count + " rows");
                 foreach(DataRow row in table.Rows) {
                     int city = 0;
+                    int world = 0;
+                    int x = 0;
+                    int y = 0;
+                    int tileType = 0;
+
+                    try {
+                        tileType = (int)row.ItemArray[3];
+                        world = (int)row.ItemArray[0];
+                        x = (int)row.ItemArray[1];
+                        y = (int)row.ItemArray[2];
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                    }
 
                     if (!row.IsNull("city")) {
-                        city = (int)row.ItemArray[5];
+                        city = (int)row.ItemArray[4];
                     }
 
                     //row.ItemArray[0].ToString();
                     foreach (var item in row.ItemArray) {
+                        if (item == DBNull.Value) continue;
                         Console.WriteLine(item);
                     }
 
                     Console.WriteLine("############");
 
-                    await new TileData() {
-                        world = (int)row.ItemArray[1],
-                        x = (int)row.ItemArray[2],
-                        y = (int)row.ItemArray[3],
-                        tileType = (string)row.ItemArray[4],
-                        city = city,
-                    }.Send(conn.sslStream);
+                    try {
+
+                        await new TileData() {
+                            world = world,
+                            x = x,
+                            y = y,
+                            tileType = tileType,
+                            city = city,
+                        }.Send(conn.sslStream);
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                    }
+
                 }
             }
         }
@@ -417,7 +433,7 @@ namespace WFA_Server
             public int world;
             public int x;
             public int y;
-            public string tileType;
+            public int tileType;
             public int city;
         }
     }

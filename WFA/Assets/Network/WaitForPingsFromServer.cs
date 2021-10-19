@@ -13,11 +13,9 @@ public class WaitForPingsFromServer : MonoBehaviour
 
         StopAllCoroutines();
         StartTimer();
-
-        EventManager.Pinged += ReceivedPing;
     }
 
-    private void ReceivedPing()
+    public void ReceivedPing()
     {
         secsSinceLastPing = 0;
         new NetMsg.Ping().Send();

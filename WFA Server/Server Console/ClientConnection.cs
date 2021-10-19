@@ -160,6 +160,14 @@ namespace WFA_Server
 
         void StartReadingStream()
         {
+            if (sslStream == null) {
+                Console.WriteLine("Stream is null");
+                return;
+            }
+            if (sslStream.IsClosed) {
+                Console.WriteLine("Stream is closed");
+                return;
+            }
             sslStream.BeginRead(byteBuffer, 0, SslServer.bufferLength, ReceiveMessage, null);
         }
 

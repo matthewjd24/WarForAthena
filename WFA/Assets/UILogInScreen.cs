@@ -14,12 +14,11 @@ public class UILogInScreen : MonoBehaviour
 
     private void Awake()
     {
-        EventManager.LoginResponse += LoginResponse;
+        inst = this;
     }
 
-    private void LoginResponse(string response)
+    public void SetStatusText(string response)
     {
-        Debug.Log(response);
         status.text = response;
     }
 

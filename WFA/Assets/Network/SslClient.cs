@@ -109,8 +109,10 @@ public class SslClient : MonoBehaviour
             return;
         }
 
+        Console.WriteLine("Received data size: " + bytes);
         byte[] receivedData = new byte[bytes];
         Array.Copy(byteBuffer, receivedData, bytes);
+        byteBuffer = new byte[bufferLength];
 
         StartReadingStream();
 

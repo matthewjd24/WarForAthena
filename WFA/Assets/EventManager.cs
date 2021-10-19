@@ -9,14 +9,6 @@ public class EventManager : MonoBehaviour
 {
     public static EventManager inst;
 
-    public static event LoginEv LoginResponse;
-    public delegate void LoginEv(string response);
-    public static event TextEv MessageReceived;
-    public delegate void TextEv(string response);
-    public static event PingEv Pinged;
-    public delegate void PingEv();
-    public static event RegisterEv RegisterResponse;
-    public delegate void RegisterEv(string response);
     public static event DcEv DCed;
     public delegate void DcEv();
 
@@ -61,15 +53,13 @@ public class EventManager : MonoBehaviour
     {
         if (queuedMessages.Count == 0) return;
 
-        foreach(var e in queuedMessages) {
-            e.Key.Receive(e.Value);
-        }
+        List<KeyValuePair<NetMsg.Message, byte[]>> queuedMsg = new List<KeyValuePair<NetMsg.Message, byte[]>>();
+        queuedMsg.AddRange(queuedMessages);
 
         queuedMessages.Clear();
-    }
 
-    public static void RecPing()
-    {
-        Pinged?.Invoke();
+        foreach (var e in queuedMsg) {
+            e.Key.Receive(e.Value);
+        }
     }
 }
