@@ -2982,7 +2982,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Request Tile
+  m_Text: Download Tiles
 --- !u!222 &1604549358
 CanvasRenderer:
   m_ObjectHideFlags: 0
