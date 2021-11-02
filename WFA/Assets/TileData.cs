@@ -46,6 +46,8 @@ public class TileData : MonoBehaviour
 
     public static Dictionary<int, TileType> tileTypes = new Dictionary<int, TileType>();
 
+    public static int maxXandY = 70;
+
     private void Awake()
     {
         inst = this;

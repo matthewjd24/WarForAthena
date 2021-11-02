@@ -16,6 +16,9 @@ namespace WFA_Server
         public static bool isLocal = false;
         public static TcpListener listener;
 
+        public static string dbUser;
+        public static string dbPass;
+
         //public delegate void MessageHandler();
         //public static Dictionary<int, MessageHandler> messageHandlers = new Dictionary<int, MessageHandler>();
 
@@ -35,6 +38,11 @@ namespace WFA_Server
                 filePath = @"C:\Users\WFA Server\Desktop\TempCert.cer";
             }
 
+
+            string[] lines = File.ReadAllLines(@"C:\Game\dblogin.txt");
+            dbUser = lines[0];
+            dbPass = lines[1];
+
             for (int i = 0; i < 20; i++) {
                 ClientSlots.Add(i, null);
             }
@@ -45,6 +53,16 @@ namespace WFA_Server
             listener.Start();
 
             WaitForClients();
+        }
+
+        public static string GetConnectionString()
+        {
+            if (!isLocal)
+                return @"Server=.\SQLEXPRESS;Database=WFA; User ID = " + dbUser + "; Password = " + dbPass;
+            else {
+                return $@"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
+                    "User ID= " + dbUser + ";Password= " + dbPass;
+            }
         }
 
         static void WaitForClients()

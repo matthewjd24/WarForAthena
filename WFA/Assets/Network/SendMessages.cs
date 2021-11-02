@@ -11,27 +11,21 @@ public class SendMessages : MonoBehaviour
         inst = this;
     }
 
-    public void RequestTiles()
+    public static void RequestTiles(Vector2Int startPos, Vector2Int endPos)
     {
-        int startX = 0;
-        int endX = 30;
-
-        int startY = 0;
-        int endY = 30;
-
         new NetMsg.RequestTileRange() {
-            world = 1,
-            startX = startX,
-            endX = endX,
-            startY = startY,
-            endY = endY
+            world = PlayerID.currentWorld,
+            startX = startPos.x,
+            endX = endPos.x,
+            startY = startPos.y,
+            endY = endPos.y
         }.Send();
     }
 
-    public void WriteTile(Vector2Int pos, int tileType)
+    public static void WriteTile(Vector2Int pos, int tileType)
     {
         new NetMsg.WriteTile() {
-            world = 1,
+            world = PlayerID.currentWorld,
             hasCity = false,
             x = pos.x,
             y = pos.y,

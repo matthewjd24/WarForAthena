@@ -110,7 +110,7 @@ namespace WFA_Server
             {
                 Console.WriteLine($"Login request: {username}, {password}");
 
-                response = await Login(username, password);
+                response = "Success"; //await Login(username, password);
                 async Task<string> Login(string username, string password)
                 {
                     string queryString = @"
@@ -125,10 +125,12 @@ namespace WFA_Server
                     string GetConnectionString()
                     {
                         if (!SslServer.isLocal)
-                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=WfaServer;Password=aPass1;";
+                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=" + SslServer.dbUser + ";" +
+                                " Password = " + SslServer.dbPass;
                         else {
                             return @"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
-                                "User ID= WfaServer;Password=aPass1";
+                                "User ID=" + SslServer.dbUser + ";" +
+                                " Password = " + SslServer.dbPass;
                         }
                     }
 
@@ -200,10 +202,12 @@ namespace WFA_Server
                     string GetConnectionString()
                     {
                         if (!SslServer.isLocal)
-                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=WfaServer;Password=aPass1;";
+                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=" + SslServer.dbUser + ";" +
+                                " Password = " + SslServer.dbPass;
                         else {
                             return @"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
-                                "User ID= WfaServer;Password=aPass1";
+                                "User ID=" + SslServer.dbUser + ";" +
+                                " Password = " + SslServer.dbPass;
                         }
                     }
 
@@ -282,26 +286,19 @@ namespace WFA_Server
                         @responseMessage = @responseMessage OUTPUT;
                         SELECT @responseMessage as N'@responseMessage'";
 
-                    string connectionString = GetConnectionString();
-                    string GetConnectionString()
-                    {
-                        if (!SslServer.isLocal)
-                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=WfaServer;Password=aPass1;";
-                        else {
-                            return @"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
-                                "User ID= WfaServer;Password=aPass1";
-                        }
-                    }
+                    string connectionString = SslServer.GetConnectionString();
+                    
 
                     string resp = "";
                     using SqlConnection connection = new SqlConnection(connectionString);
                     SqlCommand command = new SqlCommand(queryString, connection);
 
-                    await connection.OpenAsync();
                     try {
-                        SqlDataReader reader = command.ExecuteReader();
+                        await connection.OpenAsync();
 
-                        reader.Close();
+                        SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                        await reader.CloseAsync();
                     }
                     catch (Exception e) {
                         Console.WriteLine(e.Message);
@@ -329,7 +326,7 @@ namespace WFA_Server
 
             public override async Task Receive(ClientConnection conn = null)
             {
-                Console.WriteLine($"Received tile range request.");
+                //Console.WriteLine($"Received tile range request.");
 
                 DataTable table = new DataTable();
 
@@ -347,10 +344,12 @@ namespace WFA_Server
                     string GetConnectionString()
                     {
                         if (!SslServer.isLocal)
-                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=WfaServer;Password=aPass1;";
+                            return @"Server=.\SQLEXPRESS;Database=WFA; User ID = " + SslServer.dbUser + ";" +
+                                "Password = " + SslServer.dbPass;
                         else {
                             return @"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
-                                "User ID= WfaServer;Password=aPass1";
+                                "User ID= " + SslServer.dbUser + ";" +
+                                "Password = " + SslServer.dbPass;
                         }
                     }
 
@@ -375,7 +374,7 @@ namespace WFA_Server
                     }
                 }
 
-                Console.WriteLine("Got the tiles. The table has " + table.Rows.Count + " rows");
+                //Console.WriteLine("Got the tiles. The table has " + table.Rows.Count + " rows");
                 foreach(DataRow row in table.Rows) {
                     int city = 0;
                     int world = 0;
@@ -400,25 +399,18 @@ namespace WFA_Server
                     //row.ItemArray[0].ToString();
                     foreach (var item in row.ItemArray) {
                         if (item == DBNull.Value) continue;
-                        Console.WriteLine(item);
+                        //Console.WriteLine(item);
                     }
 
-                    Console.WriteLine("############");
+                    //Console.WriteLine("############");
 
-                    try {
-
-                        await new TileData() {
-                            world = world,
-                            x = x,
-                            y = y,
-                            tileType = tileType,
-                            city = city,
-                        }.Send(conn.sslStream);
-                    }
-                    catch (Exception e) {
-                        Console.WriteLine(e.Message);
-                    }
-
+                    _ = new TileData() {
+                        world = world,
+                        x = x,
+                        y = y,
+                        tileType = tileType,
+                        city = city,
+                    }.Send(conn.sslStream);
                 }
             }
         }

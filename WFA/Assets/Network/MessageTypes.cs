@@ -96,13 +96,7 @@ public static class NetMsg
 
             response = reader.ReadString();
 
-            Debug.Log("Login response: " + response);
-
-            UILogInScreen.inst.SetStatusText(response);
-            if (response.Contains("Success")) {
-                PlayerID.isLoggedIn = true;
-            }
-            StartingScreenManager.inst.GoToGame();
+            UILogInScreen.inst.LogInCallBack(response);
         }
     }
     public class Register : Message
@@ -184,7 +178,7 @@ public static class NetMsg
             tileType = reader.ReadInt32();
             city = reader.ReadInt32();
 
-            Debug.Log("Received tile data. x: " + x + ", y: " + y + ", type " + tileType);
+            //Debug.Log("Received tile data. x: " + x + ", y: " + y + ", type " + tileType);
 
             TileMapGenerator.inst.SetTile(x, y, (TileType)tileType);
         }

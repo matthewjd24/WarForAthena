@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Data;
+using System.Threading.Tasks;
 
 public class TileMapGenerator : MonoBehaviour
 {
@@ -121,7 +122,7 @@ public class TileMapGenerator : MonoBehaviour
     
 
     [ContextMenu("LogTiles")]
-    void RecordSet()
+    async Task RecordSet()
     {
         int i = 0;
         foreach (var position in map.cellBounds.allPositionsWithin) {
@@ -138,8 +139,10 @@ public class TileMapGenerator : MonoBehaviour
 
             if (value != null) {
                 Debug.Log("step " + i + ", pos " + position + ", " + value.type + ", " + value.id);
-                SendMessages.inst.WriteTile((Vector2Int)position, (int)value.type);
+                SendMessages.WriteTile((Vector2Int)position, (int)value.type);
             }
+
+            Task.Delay(10);
         }
 
         Debug.Log("Done!");

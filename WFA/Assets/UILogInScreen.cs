@@ -24,6 +24,8 @@ public class UILogInScreen : MonoBehaviour
 
     public void TryLogIn()
     {
+        status.text = "Logging in...";
+
         string name = userinp.text;
         string pass = passinp.text;
 
@@ -31,5 +33,16 @@ public class UILogInScreen : MonoBehaviour
             username = name,
             password = pass,
         }.Send();
+    }
+
+    public void LogInCallBack(string msg)
+    {
+        Debug.Log("Login response: " + msg);
+
+        status.text = msg;
+        if (msg.Contains("Success")) {
+            PlayerID.isLoggedIn = true;
+            StartingScreenManager.inst.GoToGame();
+        }
     }
 }

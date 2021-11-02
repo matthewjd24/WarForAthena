@@ -8,7 +8,7 @@ public class StartingScreenManager : MonoBehaviour
 
     [SerializeField] List<GameObject> children = new List<GameObject>();
 
-    [SerializeField] GameObject inGameUI;
+    [SerializeField] GameObject Game;
 
     private void Awake()
     {
@@ -33,11 +33,10 @@ public class StartingScreenManager : MonoBehaviour
 
     public void GoToGame()
     {
-        foreach (var e in children) {
-            e.SetActive(false);
-        }
+        PlayerID.currentWorld = 1;
 
-        inGameUI.SetActive(true);
+        gameObject.SetActive(false);
+        Game.SetActive(true);
 
         Debug.Log("Going to game");
     }

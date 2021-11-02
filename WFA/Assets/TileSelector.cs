@@ -9,6 +9,7 @@ public class TileSelector : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0)) {
+            return;
             Vector2 mousPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int gridPos = TileMapGenerator.map.WorldToCell(mousPos);
 

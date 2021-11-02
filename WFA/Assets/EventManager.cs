@@ -17,6 +17,7 @@ public class EventManager : MonoBehaviour
     static Dictionary<int, NetMsg.Message> dict = new Dictionary<int, NetMsg.Message>();
 
     static List<KeyValuePair<NetMsg.Message, byte[]>> queuedMessages = new List<KeyValuePair<NetMsg.Message, byte[]>>();
+    int framesSinceMsg = 0;
 
     private void Awake()
     {
@@ -52,9 +53,15 @@ public class EventManager : MonoBehaviour
     private void Update()
     {
         if (queuedMessages.Count == 0) return;
-
         List<KeyValuePair<NetMsg.Message, byte[]>> queuedMsg = new List<KeyValuePair<NetMsg.Message, byte[]>>();
-        queuedMsg.AddRange(queuedMessages);
+
+        try {
+            queuedMsg.AddRange(queuedMessages);
+        }
+        catch (Exception e){
+            //Debug.Log(e);
+            return;
+        }
 
         queuedMessages.Clear();
 

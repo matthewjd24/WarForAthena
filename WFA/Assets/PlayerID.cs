@@ -7,6 +7,7 @@ public class PlayerID : MonoBehaviour
     public static PlayerID inst;
     public static string accountName;
     public static bool isLoggedIn;
+    public static int currentWorld;
 
     private void Awake()
     {
