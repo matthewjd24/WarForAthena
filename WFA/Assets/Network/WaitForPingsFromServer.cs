@@ -12,18 +12,23 @@ public class WaitForPingsFromServer : MonoBehaviour
         inst = this;
 
         StopAllCoroutines();
-        StartTimer();
-    }
-
-    public void ReceivedPing()
-    {
-        secsSinceLastPing = 0;
-        new NetMsg.Ping().Send();
-    }
-
-    public void StartTimer()
-    {
         StartCoroutine(checkStream());
+
+        EventManager.MsgReceived += MsgReceived;
+    }
+    private void OnDisable()
+    {
+        EventManager.MsgReceived -= MsgReceived;
+    }
+
+    public void MsgReceived(string[] msg)
+    {
+        if (msg[0] != "ping") return;
+
+        secsSinceLastPing = 0;
+        //new NetMsg.Ping().Send();
+
+        _ = NetMsg.SendMsg("ping;");
     }
 
     IEnumerator checkStream()

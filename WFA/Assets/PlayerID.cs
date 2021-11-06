@@ -8,6 +8,7 @@ public class PlayerID : MonoBehaviour
     public static string accountName;
     public static bool isLoggedIn;
     public static int currentWorld;
+    public static int currentCity;
 
     private void Awake()
     {
@@ -16,7 +17,7 @@ public class PlayerID : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.DCed += Disconnected;
+        //EventManager.DCed += Disconnected;
     }
 
     private void Disconnected()

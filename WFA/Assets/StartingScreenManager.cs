@@ -6,20 +6,32 @@ public class StartingScreenManager : MonoBehaviour
 {
     public static StartingScreenManager inst;
 
-    [SerializeField] List<GameObject> children = new List<GameObject>();
+    [SerializeField] GameObject connect;
+    [SerializeField] GameObject login;
+    [SerializeField] GameObject register;
+    [SerializeField] GameObject dced;
+
+    List<GameObject> screens;
 
     [SerializeField] GameObject Game;
 
     private void Awake()
     {
         inst = this;
+        screens = new List<GameObject>() {
+            connect,
+            login,
+            register,
+            dced
+        };
     }
 
     void Start()
     {
-        foreach(Transform child in transform) {
-            children.Add(child.gameObject);
+        foreach(var e in screens) {
+            e.SetActive(false);
         }
+        connect.SetActive(true);
 
         StartCoroutine(WaitUntilConnected());
     }
@@ -27,15 +39,15 @@ public class StartingScreenManager : MonoBehaviour
     IEnumerator WaitUntilConnected()
     {
         yield return new WaitUntil(() => SslClient.sslStream != null);
-        children[0].SetActive(false);
-        children[1].SetActive(true);
+        connect.SetActive(false);
+        login.SetActive(true);
     }
 
     public void GoToGame()
     {
         PlayerID.currentWorld = 1;
 
-        gameObject.SetActive(false);
+        transform.parent.gameObject.SetActive(false);
         Game.SetActive(true);
 
         Debug.Log("Going to game");

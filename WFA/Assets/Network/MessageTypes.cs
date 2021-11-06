@@ -9,13 +9,33 @@ public static class NetMsg
 {
     public static bool isServer = false;
 
+    public static async Task SendMsg(string str)
+    {
+        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
+
+        if (SslClient.sslStream == null) {
+            //Debug.LogError("Stream is null");
+            return;
+        }
+        if (SslClient.sslStream.IsClosed) {
+            //Debug.LogError("Stream is closed");
+            return;
+        }
+
+        await SslClient.sslStream.WriteAsync(bytes, 0, bytes.Length);
+    }
+
+    /*
     public class Message
     {
-        public int ID;
-        public string response;
-        public byte[] data;
+        //public int ID;
+        //public string response;
+        public string message;
+        //public byte[] data;
 
         public void Send() {
+
+            
             Type myType = GetType();
             FieldInfo[] info = myType.GetFields();
 
@@ -50,26 +70,35 @@ public static class NetMsg
                     }
                 }
             }
+            
 
-
-            byte[] bytes = m.ToArray();
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(message);
 
             if (SslClient.sslStream == null) {
-                Debug.LogError("Stream is null");
+                //Debug.LogError("Stream is null");
                 return;
             }
             if (SslClient.sslStream.IsClosed) {
-                Debug.LogError("Stream is closed");
+                //Debug.LogError("Stream is closed");
                 return;
             }
 
             SslClient.sslStream.Write(bytes, 0, bytes.Length);
         }
-        public virtual void Receive(byte[] data) { }
+        public virtual void Receive(byte[] data) { 
+            
+        }
     }
 
+    
+    public class StringMessage : Message
+    {
+
+    }
     public class Ping : Message
     {
+        public string message;
+
         public Ping()
         {
             ID = 1;
@@ -183,4 +212,5 @@ public static class NetMsg
             TileMapGenerator.inst.SetTile(x, y, (TileType)tileType);
         }
     }
+    */
 }

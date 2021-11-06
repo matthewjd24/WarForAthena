@@ -13,6 +13,8 @@ public class UIRegisterScreen : MonoBehaviour
 
     [SerializeField] Text status;
 
+    string response = null;
+
     private void Awake()
     {
         inst = this;
@@ -21,24 +23,57 @@ public class UIRegisterScreen : MonoBehaviour
     private void OnEnable()
     {
         status.text = "";
+        response = null;
+        EventManager.MsgReceived += EventManager_MsgReceived;
     }
 
-    public void SetStatusText(string response)
+    private void OnDisable()
     {
-        status.text = response;
+        EventManager.MsgReceived -= EventManager_MsgReceived;
     }
 
-    public void Register()
+    private void EventManager_MsgReceived(string[] msg)
     {
-        string username = userinp.text;
+        if (msg[0] != "register") return;
+        response = msg[1];
+    }
+
+    public void StartRegister()
+    {
+        StartCoroutine(TryRegister());
+    }
+
+    IEnumerator TryRegister()
+    {
+        response = null;
+        float secs = 0;
+        status.text = "Registering...";
+
+        string name = userinp.text;
         string pass = passinp.text;
         string email = emailinp.text;
 
-        new NetMsg.Register() {
-            username = username,
-            password = pass,
-            email = email,
-        }.Send();
-        status.text = "Registering...";
+        _ = NetMsg.SendMsg($"register;{name};{pass};{email}");
+
+        while (response == null) {
+            yield return new WaitForEndOfFrame();
+            secs += Time.deltaTime;
+
+            if (secs > 6) {
+                Debug.Log("Register timeout");
+                status.text = "Timed out";
+                yield break;
+            }
+        }
+
+        Debug.Log("Register response: " + response);
+
+        status.text = response;
+        if (response.Contains("Success")) {
+            PlayerID.isLoggedIn = true;
+            StartingScreenManager.inst.GoToGame();
+        }
+
+        response = null;
     }
 }

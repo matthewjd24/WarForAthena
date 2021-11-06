@@ -33,29 +33,18 @@ namespace WFA_Server
 
         Dictionary<int, NetMsg.Message> dict = new Dictionary<int, NetMsg.Message>();
 
+        public event MsgRecEventHandler MsgReceived;
+        public delegate void MsgRecEventHandler(string[] msg);
+        HandleMessages taskHandler;
+
         public ClientConnection(TcpClient client, int id)
         {
-            SetUpDict();
-            void SetUpDict()
-            {
-                NetMsg.Ping resp = new();
-                NetMsg.Login req = new();
-                NetMsg.Register reg = new();
-                NetMsg.WriteTile til = new();
-                NetMsg.RequestTileRange reqTilR = new();
-                NetMsg.TileData tilDat = new();
-                dict.Add(resp.ID, resp);
-                dict.Add(req.ID, req);
-                dict.Add(reg.ID, reg);
-                dict.Add(til.ID, til);
-                dict.Add(reqTilR.ID, reqTilR);
-                dict.Add(tilDat.ID, tilDat);
-            }
 
             Console.WriteLine("A client connected.");
             sslStream = new Stream(client.GetStream());
             tcpClient = client;
             clientID = id;
+            taskHandler = new HandleMessages(this);
 
             try {
                 sslStream.AuthenticateAsServer(SslServer.serverCertificate, clientCertificateRequired: false, checkCertificateRevocation: true);
@@ -81,6 +70,18 @@ namespace WFA_Server
             StartReadingStream();
         }
 
+        void StartReadingStream()
+        {
+            if (sslStream == null) {
+                Console.WriteLine("Stream is null");
+                return;
+            }
+            if (sslStream.IsClosed) {
+                Console.WriteLine("Stream is closed");
+                return;
+            }
+            sslStream.BeginRead(byteBuffer, 0, SslServer.bufferLength, ReceiveMessage, null);
+        }
 
         void ReceiveMessage(IAsyncResult ar)
         {
@@ -111,8 +112,21 @@ namespace WFA_Server
 
             byte[] data = new byte[bytes];
             Array.Copy(byteBuffer, data, bytes);
+            byteBuffer = new byte[SslServer.bufferLength];
 
-            int msgID = BitConverter.ToInt32(data, 0);
+
+
+            string message = Encoding.UTF8.GetString(data);
+
+            string[] parts = message.Split(';');
+            if (parts[^1] == "") {
+                parts = parts.Take(parts.Length - 1).ToArray();
+            }
+
+            taskHandler.MsgReceived(parts);
+
+
+            /*int msgID = BitConverter.ToInt32(data, 0);
             data = data.Skip(4).ToArray();
 
             dict.TryGetValue(msgID, out NetMsg.Message message);
@@ -152,23 +166,10 @@ namespace WFA_Server
             }
             else {
                 Console.WriteLine("msg is not in the dict");
-            }
+            }*/
 
 
             StartReadingStream();
-        }
-
-        void StartReadingStream()
-        {
-            if (sslStream == null) {
-                Console.WriteLine("Stream is null");
-                return;
-            }
-            if (sslStream.IsClosed) {
-                Console.WriteLine("Stream is closed");
-                return;
-            }
-            sslStream.BeginRead(byteBuffer, 0, SslServer.bufferLength, ReceiveMessage, null);
         }
 
         async Task PingClient()
@@ -177,11 +178,13 @@ namespace WFA_Server
 
             while (true) {
                 await Task.Delay(2000);
-                secsSinceLastPingResponse++;
+                secsSinceLastPingResponse += 2;
 
-                _ = new NetMsg.Ping().Send(sslStream);
+                //_ = new NetMsg.Ping().Send(sslStream);
 
-                if(secsSinceLastPingResponse > 8) {
+                _ = NetMsg.SendMsg("ping;", sslStream);
+
+                if(secsSinceLastPingResponse > 4) {
                     Console.WriteLine($"We have a problem. {clientID} isn't responding.");
                     CloseConnection();
                     break;

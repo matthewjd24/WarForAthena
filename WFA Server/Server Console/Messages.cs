@@ -14,6 +14,13 @@ namespace WFA_Server
     {
         public static bool isServer = true;
 
+        public static async Task SendMsg(string str, SslStream stream)
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
+
+            await stream.WriteAsync(bytes, 0, bytes.Length);
+        }
+
         public class Message
         {
             public int ID;
@@ -198,18 +205,7 @@ namespace WFA_Server
                         @responseMessage=@responseMessage OUTPUT
                         SELECT @responseMessage as N'@responseMessage'";
 
-                    string connectionString = GetConnectionString();
-                    string GetConnectionString()
-                    {
-                        if (!SslServer.isLocal)
-                            return @"Server=.\SQLEXPRESS;Database=WFA;User Id=" + SslServer.dbUser + ";" +
-                                " Password = " + SslServer.dbPass;
-                        else {
-                            return @"Server=35.164.92.71\SQLEXPRESS,1433;Initial Catalog=WFA;" +
-                                "User ID=" + SslServer.dbUser + ";" +
-                                " Password = " + SslServer.dbPass;
-                        }
-                    }
+                    string connectionString = SslServer.GetConnectionString();
 
                     string resp = "start";
                     try {

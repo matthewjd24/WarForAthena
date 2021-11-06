@@ -9,12 +9,14 @@ public class TileSelector : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0)) {
-            return;
             Vector2 mousPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int gridPos = TileMapGenerator.map.WorldToCell(mousPos);
 
+            //Debug.Log(gridPos);
+            return;
+
             lastselectedcell = gridPos;
-            TileData.tilesInfo.TryGetValue(gridPos, out TileInfo value);
+            TileData.mapTiles.TryGetValue(gridPos, out TileInfo value);
 
             if (value != null) {
                 Debug.Log(gridPos + ", " + value.type + ", " + value.id);

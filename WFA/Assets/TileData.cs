@@ -26,12 +26,13 @@ public class TileInfo
     public TileType type { get; private set; }
     public int id { get; private set; }
     public TileBase tileBase { get; private set; }
+    public int level { get; private set; }
 }
 
 public class TileData : MonoBehaviour
 {
     public static TileData inst;
-    public static Dictionary<Vector3Int, TileInfo> tilesInfo = new Dictionary<Vector3Int, TileInfo>();
+    public static Dictionary<Vector3Int, TileInfo> mapTiles = new Dictionary<Vector3Int, TileInfo>();
     public int nextID = 0;
 
     public List<TileBase> forestTiles = new List<TileBase>();
@@ -80,6 +81,16 @@ public class TileData : MonoBehaviour
         foreach(var e in tileTypes) {
             tileTypes.TryGetValue(e.Key, out TileType result);
         }
+    }
+
+    public static bool CheckIfInsideBoundaries(int x, int y)
+    {
+        if (x < 1) return false;
+        if (x > maxXandY) return false;
+        if (y < 1) return false;
+        if (y > maxXandY) return false;
+
+        return true;
     }
 }
 

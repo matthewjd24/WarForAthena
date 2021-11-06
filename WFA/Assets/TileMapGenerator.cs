@@ -80,9 +80,9 @@ public class TileMapGenerator : MonoBehaviour
         map.SetTile(pos, newTile);
 
 
-        if (TileData.tilesInfo.ContainsKey(pos)) return;
+        if (TileData.mapTiles.ContainsKey(pos)) return;
 
-        TileData.tilesInfo.Add(pos, theInfo);
+        TileData.mapTiles.Add(pos, theInfo);
     }
 
     [ContextMenu("GenerateTiles")]
@@ -90,7 +90,7 @@ public class TileMapGenerator : MonoBehaviour
     {
         GenerateChances();
 
-        TileData.tilesInfo.Clear();
+        TileData.mapTiles.Clear();
         TileData.inst.MakeTileDefinitions();
 
         for (int x = xMin; x < xMax; x++) {
@@ -135,7 +135,7 @@ public class TileMapGenerator : MonoBehaviour
             TileBase tbase = map.GetTile(position);
             Debug.Log($"{position}, {tbase.name}");
 
-            TileData.tilesInfo.TryGetValue(position, out TileInfo value);
+            TileData.mapTiles.TryGetValue(position, out TileInfo value);
 
             if (value != null) {
                 Debug.Log("step " + i + ", pos " + position + ", " + value.type + ", " + value.id);
